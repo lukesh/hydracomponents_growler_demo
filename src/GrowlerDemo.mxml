@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+HydraMVC - Copyright (c) 2009 andCulture, Inc. Some rights reserved.
+Your reuse is governed by the Creative Commons Attribution 3.0 United States License    
+-->    
+<mx:Application 
+	xmlns:mx="http://www.adobe.com/2006/mxml"
+	xmlns:growl="com.hydraframework.components.growler.*" 
+	layout="absolute"
+	creationComplete="handleCreationComplete(event)"
+	backgroundColor="0xFFFFFF"
+	>
+	<mx:Style source="/assets/styles/fonts.css" />
+	<mx:Style source="/assets/styles/style.css" />
+	<mx:Script>
+		<![CDATA[
+			import com.hydraframework.demos.growler.growls.*;
+			import mx.controls.Alert;
+			import mx.events.FlexEvent;
+			import com.hydraframework.components.growler.view.events.GrowlEvent;
+			import com.hydraframework.components.growler.model.GrowlDescriptor;
+			
+			private function handleCreationComplete(event:FlexEvent):void
+			{
+				var growlClassArray:Array = 
+					[
+						{data:DefaultGrowl, label:"Growl 1 (Colored Button)"},
+						{data:ErrorGrowl, label:"Growl 2 (Colored Everything)"}
+					];
+				wGrowlClass.dataProvider = growlClassArray;
+				growler.addEventListener(GrowlEvent.GROWL, handleGrowlEvent);
+				growler.addEventListener(GrowlEvent.CLICK, handleGrowlEvent);
+				wGrowlButton.addEventListener(MouseEvent.CLICK, handleGrowlButtonClick);
+			}
+			
+			private function handleGrowlEvent(event:GrowlEvent):void
+			{
+				switch (event.type)
+				{
+					case GrowlEvent.GROWL:
+						trace("A new growl has been created.");
+						break;
+					case GrowlEvent.CLICK:
+						trace("A growl's action button has been clicked. This notification was passed:");
+						trace("     '" + event.descriptor.notification + "'");
+						trace();
+						Alert.show(event.descriptor.notification.toString(), "Notification");
+						break;
+				}
+			}
+			
+			private function handleGrowlButtonClick(event:MouseEvent):void
+			{
+				this.growler.growl(
+					new GrowlDescriptor(
+						this.wTitle.text,
+						this.wDescription.text,
+						this.wAction.text,
+						parseInt(this.wColor.text),
+						this.wNotification.text
+						)
+					);
+			}
+		]]>
+	</mx:Script>
+	<mx:VBox x="10" y="10">
+		<mx:Label text="Title" />
+		<mx:TextInput width="300" id="wTitle" text="Growl Title" />
+		<mx:Label text="Description" />
+		<mx:TextInput width="300" id="wDescription" text="This is a test of the growl notification system." />
+		<mx:Label text="Action Button Label" />
+		<mx:TextInput width="150" id="wAction" text="Click Me..." />
+		<mx:Label text="Color (HEX)" />
+		<mx:TextInput width="150" id="wColor" text="0x00CCEE" />
+		<mx:Label text="Notification (Object)" />
+		<mx:TextInput width="300" id="wNotification" text="This can be anything." />
+		<mx:ComboBox id="wGrowlClass" />
+		<mx:Button label="Growl" id="wGrowlButton" />
+	</mx:VBox>
+	<growl:Growler 
+		top="5" 
+		height="{this.height-10}" 
+		growlerClass="{wGrowlClass.selectedItem.data as Class}" 
+		id="growler" 
+		x="{this.width-growler.width}" 
+		horizontalGap="5"
+		verticalGap="5"
+		/>
+</mx:Application>
